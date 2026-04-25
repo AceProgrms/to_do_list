@@ -1,10 +1,10 @@
-// 1. Select the elements we need
+// Select the elements we need
 const input = document.getElementById('taskInput');
 const addBtn = document.getElementById('addBtn');
 const removeBtn = document.getElementById('removeBtn');
 const taskList = document.getElementById('taskList');
 
-// 2. Function to add a task
+//  Function to add a task
 function addTask() {
     const taskValue = input.value;
 
@@ -12,21 +12,22 @@ function addTask() {
         alert("Please enter a task!");
         return;
     }
-
-    // Create a new list item
     const li = document.createElement('li');
-    li.textContent = taskValue;
 
-    // Logic to "Tick Off" (Toggle CSS class)
-    li.addEventListener('click', () => {
-        li.classList.toggle('completed');
-    });
+    // 1. Create a span for the text (so we can click it to toggle)
+    const taskText = document.createElement('span');
+    taskText.textContent = taskValue;
+    taskText.addEventListener('click', () => li.classList.toggle('completed'));
 
-    // Logic to "Remove" (Right-click to delete)
-    li.addEventListener('contextmenu', (e) => {
-        e.preventDefault(); // Stop the menu from popping up
-        li.remove();
-    });
+   // 2. Create a delete button for THIS specific task
+    const delBtn = document.createElement('button');
+    delBtn.textContent = "X";
+    delBtn.style.marginLeft = "10px";
+    delBtn.addEventListener('click', () => li.remove());
+
+    // 3. Put them both inside the <li>
+    li.appendChild(taskText);
+    li.appendChild(delBtn);
 
     // Add the item to the list and clear input
     taskList.appendChild(li);
@@ -45,5 +46,5 @@ input.addEventListener('keypress', (e) => {
 //removeBtn funtionality
 removeBtn.addEventListener('click', () =>
 {
-    taskList.remove()
+    taskList.innerHTML = "";
 });
