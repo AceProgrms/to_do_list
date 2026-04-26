@@ -4,47 +4,76 @@ const addBtn = document.getElementById('addBtn');
 const removeBtn = document.getElementById('removeBtn');
 const taskList = document.getElementById('taskList');
 
-//  Function to add a task
-function addTask() {
-    const taskValue = input.value;
+// Function to save tasks to localStorage
+function saveTasks() {
+    const tasks = [];
+    document.querySelectorAll('#taskList li span').forEach(span => {
+        tasks.push(span.textContent);
+    });
+    localStorage.setItem('myTasks', JSON.stringify(tasks));
+}
 
-    if (taskValue === "") {
-        alert("Please enter a task!");
-        return;
-    }
+// Function to render a task
+function renderTask(text) {
     const li = document.createElement('li');
 
-    // 1. Create a span for the text (so we can click it to toggle)
+    // Create a span for the text (so we can click it to toggle)
     const taskText = document.createElement('span');
-    taskText.textContent = taskValue;
-    taskText.addEventListener('click', () => li.classList.toggle('completed'));
+    taskText.textContent = text;
+    taskText.addEventListener('click', () => {
+        li.classList.toggle('completed');
+        saveTasks();
+    });
 
-   // 2. Create a delete button for THIS specific task
+    // Create a delete button for THIS specific task
     const delBtn = document.createElement('button');
     delBtn.textContent = "X";
     delBtn.style.marginLeft = "10px";
-    delBtn.addEventListener('click', () => li.remove());
+    delBtn.addEventListener('click', () => {
+        li.remove();
+        saveTasks();
+    });
 
-    // 3. Put them both inside the <li>
+    // Put them both inside the <li>
     li.appendChild(taskText);
     li.appendChild(delBtn);
 
-    // Add the item to the list and clear input
     taskList.appendChild(li);
-    input.value = "";
 }
 
-addBtn.addEventListener('click', addTask);
+// Load tasks from localStorage on page load
+function loadTasks() {
+    const savedTasks = JSON.parse(localStorage.getItem('myTasks'));
+    if (savedTasks) {
+        savedTasks.forEach(taskText => {
+            renderTask(taskText);
+        });
+    }
+}
 
-// Press Enter key
-input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        addTask();
+// Add task button click
+addBtn.addEventListener('click', () => {
+    if (input.value !== "") {
+        renderTask(input.value);
+        saveTasks();
+        input.value = "";
     }
 });
 
-//removeBtn funtionality
-removeBtn.addEventListener('click', () =>
-{
-    taskList.innerHTML = "";
+// Press Enter key
+input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && input.value !== "") {
+        renderTask(input.value);
+        saveTasks();
+        input.value = "";
+    }
 });
+
+// Clear all tasks button
+removeBtn.addEventListener('click', () => {
+    taskList.innerHTML = "";
+    localStorage.removeItem('myTasks');
+});
+
+// Load saved tasks on startup
+loadTasks();
